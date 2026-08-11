@@ -16,8 +16,8 @@ SQLite
 - Автовыдачи нет.
 - Автоматической проверки оплаты нет.
 - Оплата внутри бота не используется.
-- При оплате рублями бот показывает номер телефона для перевода через Т-Банк / СБП.
-- Оплата товара может проходить рублями через Т-Банк или вручную Stars владельцу,
+- При оплате рублями бот показывает номер телефона для перевода через банковскую карту.
+- Оплата товара может проходить рублями по номеру карты или вручную Stars владельцу,
   если для конкретного товара указана цена в Stars.
 - Раздел «Купить Stars» работает как отдельный склад: у пакета задаются количество Stars
   в одном заказе, цена в рублях, общий остаток Stars и способ выдачи.
@@ -67,7 +67,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 BOT_TOKEN = "8620565629:AAFT7qVR3_m7y17ungRPEpOTZJ1Bm13Wg2I"
 
 # Telegram ID владельца. Узнать можно через @userinfobot.
-OWNER_ID = 8586623576
+OWNER_ID = 8872934046
 
 # Заявки на выдачу бот отправляет только владельцу в личные сообщения.
 # Владелец должен хотя бы один раз открыть бота и нажать /start.
@@ -78,15 +78,14 @@ REVIEWS_CHANNEL_URL = "https://t.me/sindromovrep"
 # Username администратора без @. Кнопка поддержки откроет личный чат.
 SUPPORT_USERNAME = "vksindromov"
 
-# Ручная оплата рублями переводом по номеру телефона через Т-Банк / СБП.
-# Впишите номер телефона, который дал клиент, и имя получателя.
-# Номер карты нигде не используется.
-T_BANK_CARD_NUMBER = "22022084481990316"
-T_BANK_RECIPIENT = "Кирилл"
-T_BANK_NAME = "Cбербанк"
+# Ручная оплата рублями переводом по номеру банковской карты.
+# Впишите сюда номер карты, на которую покупатель должен сделать перевод.
+T_BANK_CARD_NUMBER = "2202208481990316"
+T_BANK_RECIPIENT = "Тимур/Наталья"
+T_BANK_NAME = "Т-Банк"
 
 # Username владельца без @. Сюда покупатель перейдёт для ручной передачи Stars.
-STARS_RECEIVER_USERNAME = "vksindromov"
+STARS_RECEIVER_USERNAME = "fegote"
 
 # Часовой пояс для дат и статистики «за сегодня».
 TIMEZONE_NAME = "Europe/Riga"
@@ -1342,9 +1341,9 @@ async def show_payment_methods(message: Message, state: FSMContext) -> None:
 
     payment_rows: list[list[InlineKeyboardButton]] = []
     if final_price_rub > 0:
-        payment_rows.append([InlineKeyboardButton(text=f"💳 Т-Банк — {money(final_price_rub)}", callback_data="pay:card")])
+        payment_rows.append([InlineKeyboardButton(text=f"₽ Рубли — {money(final_price_rub)}", callback_data="pay:card")])
     if product["category"] != "stars" and final_price_stars > 0:
-        payment_rows.append([InlineKeyboardButton(text=f"⭐ Stars — {stars(final_price_stars)}", callback_data="pay:stars")])
+        payment_rows.append([InlineKeyboardButton(text=f"⭐️ Звезды — {stars(final_price_stars)}", callback_data="pay:stars")])
     payment_rows.append([InlineKeyboardButton(text="❌ Отменить", callback_data="purchase:cancel")])
     await message.answer("\n".join(text), reply_markup=InlineKeyboardMarkup(inline_keyboard=payment_rows))
 
@@ -1556,23 +1555,23 @@ async def callback_payment_method(callback: CallbackQuery, state: FSMContext) ->
 
     await callback.answer()
     if method == "card":
-        phone = T_BANK_PHONE.strip()
+        card_number = T_BANK_CARD_NUMBER.strip()
         recipient = T_BANK_RECIPIENT.strip()
         bank_name = T_BANK_NAME.strip() or "Т-Банк"
-        if not phone or phone == "+7XXXXXXXXXX":
+        if not card_number or card_number == "2202208481990316":
             await callback.answer(
-                "Номер телефона для оплаты не настроен владельцем.",
+                "Номер карты для оплаты не настроен владельцем.",
                 show_alert=True,
             )
             return
         payment_text = (
-            "<b>💳 Оплата рублями по номеру телефона</b>\n\n"
+            "<b>₽ Оплата рублями</b>\n\n"
             f"Сумма: <b>{money(final_price_rub)}</b>\n"
             f"Банк: <b>{html.escape(bank_name)}</b>\n"
-            f"Номер телефона: <code>{html.escape(phone)}</code>\n"
+            f"Номер карты: <code>{html.escape(card_number)}</code>\n"
             f"Получатель: <b>{html.escape(recipient or 'уточните перед переводом')}</b>\n\n"
-            "Переведите точную сумму по номеру телефона. Перед подтверждением "
-            "проверьте имя получателя, затем нажмите кнопку ниже и отправьте чек."
+            "Переведите точную сумму на указанную карту. Перед подтверждением "
+            "проверьте реквизиты, затем нажмите кнопку ниже и отправьте чек."
         )
         keyboard = InlineKeyboardMarkup(
             inline_keyboard=[
@@ -2548,3 +2547,4 @@ async def main() -> None:
 
 if __name__ == "__main__":
     asyncio.run(main())
+# Реквизиты оплаты: Сбербанк, получатель Кирилл, карта 2202208481990316
