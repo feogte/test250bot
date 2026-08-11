@@ -81,12 +81,12 @@ SUPPORT_USERNAME = "vksindromov"
 # Ручная оплата рублями переводом по номеру телефона через Т-Банк / СБП.
 # Впишите номер телефона, который дал клиент, и имя получателя.
 # Номер карты нигде не используется.
-T_BANK_PHONE = "22022084481990316"
+T_BANK_CARD_NUMBER = "22022084481990316"
 T_BANK_RECIPIENT = "Кирилл"
 T_BANK_NAME = "Cбербанк"
 
 # Username владельца без @. Сюда покупатель перейдёт для ручной передачи Stars.
-STARS_RECEIVER_USERNAME = "fegote"
+STARS_RECEIVER_USERNAME = "vksindromov"
 
 # Часовой пояс для дат и статистики «за сегодня».
 TIMEZONE_NAME = "Europe/Riga"
