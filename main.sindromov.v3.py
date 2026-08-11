@@ -81,11 +81,11 @@ SUPPORT_USERNAME = "vksindromov"
 # Ручная оплата рублями переводом по номеру банковской карты.
 # Впишите сюда номер карты, на которую покупатель должен сделать перевод.
 T_BANK_CARD_NUMBER = "2202208481990316"
-T_BANK_RECIPIENT = "Тимур/Наталья"
-T_BANK_NAME = "Т-Банк"
+T_BANK_RECIPIENT = "Кирилл"
+T_BANK_NAME = "Сбербанк"
 
 # Username владельца без @. Сюда покупатель перейдёт для ручной передачи Stars.
-STARS_RECEIVER_USERNAME = "fegote"
+STARS_RECEIVER_USERNAME = "vksindromov"
 
 # Часовой пояс для дат и статистики «за сегодня».
 TIMEZONE_NAME = "Europe/Riga"
@@ -131,7 +131,7 @@ ORDER_STATUS_LABELS = {
 }
 
 PAYMENT_METHOD_LABELS = {
-    "card": "💳 Т-Банк по телефону (рубли)",
+    "card": "₽ Рубли — оплата на карту",
     "stars": "⭐ Оплата Telegram Stars",
 }
 
@@ -881,7 +881,7 @@ class Database:
                     return False, "Для товара недоступна оплата Stars.", None
                 if product["category"] == "stars" and payment_method != "card":
                     self.conn.rollback()
-                    return False, "Покупка Stars оплачивается рублями через Т-Банк.", None
+                    return False, "Покупка Stars оплачивается рублями переводом на карту.", None
 
                 now = utc_now_iso()
                 cursor = self.conn.execute(
@@ -1550,7 +1550,7 @@ async def callback_payment_method(callback: CallbackQuery, state: FSMContext) ->
         await callback.answer("Оплата Stars для этого товара недоступна.", show_alert=True)
         return
     if product["category"] == "stars" and method != "card":
-        await callback.answer("Покупка Stars оплачивается рублями через Т-Банк.", show_alert=True)
+        await callback.answer("Покупка Stars оплачивается рублями переводом на карту.", show_alert=True)
         return
 
     await callback.answer()
@@ -1558,7 +1558,7 @@ async def callback_payment_method(callback: CallbackQuery, state: FSMContext) ->
         card_number = T_BANK_CARD_NUMBER.strip()
         recipient = T_BANK_RECIPIENT.strip()
         bank_name = T_BANK_NAME.strip() or "Т-Банк"
-        if not card_number or card_number == "2202208481990316":
+        if not card_number:
             await callback.answer(
                 "Номер карты для оплаты не настроен владельцем.",
                 show_alert=True,
@@ -1575,7 +1575,7 @@ async def callback_payment_method(callback: CallbackQuery, state: FSMContext) ->
         )
         keyboard = InlineKeyboardMarkup(
             inline_keyboard=[
-                [InlineKeyboardButton(text="📎 Отправить чек Т-Банка", callback_data="receipt:start")],
+                [InlineKeyboardButton(text="📎 Отправить чек", callback_data="receipt:start")],
                 [InlineKeyboardButton(text="❌ Отменить", callback_data="purchase:cancel")],
             ]
         )
@@ -1621,7 +1621,7 @@ async def callback_receipt_start(callback: CallbackQuery, state: FSMContext) -> 
             )
         else:
             prompt = (
-                "Отправьте <b>чек перевода через Т-Банк</b> одним сообщением.\n\n"
+                "Отправьте <b>чек перевода на карту Сбербанка</b> одним сообщением.\n\n"
                 "Можно отправить изображение как фото или документ."
             )
         await callback.message.answer(prompt)
