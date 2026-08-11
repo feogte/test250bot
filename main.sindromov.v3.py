@@ -67,7 +67,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 BOT_TOKEN = "8620565629:AAFT7qVR3_m7y17ungRPEpOTZJ1Bm13Wg2I"
 
 # Telegram ID владельца. Узнать можно через @userinfobot.
-OWNER_ID = 8872934046
+OWNER_ID = 8586623576
 
 # Заявки на выдачу бот отправляет только владельцу в личные сообщения.
 # Владелец должен хотя бы один раз открыть бота и нажать /start.
